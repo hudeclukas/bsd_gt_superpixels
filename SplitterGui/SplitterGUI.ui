@@ -1,501 +1,309 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <author>Lukas Hudec</author>
- <class>UserGui</class>
- <widget class="QMainWindow" name="UserGui">
+ <class>SplitterGUI</class>
+ <widget class="QMainWindow" name="SplitterGUI">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1025</width>
-    <height>589</height>
+    <width>1000</width>
+    <height>610</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>VDSuperVis</string>
+   <string>Ground truth to superpixels</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="centralGridLayout">
-    <item row="0" column="1">
-     <spacer name="hrSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Preferred</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>10</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetNoConstraint</enum>
-      </property>
-      <item row="0" column="2">
-       <layout class="QVBoxLayout" name="toolboxLayout">
-        <property name="spacing">
-         <number>8</number>
-        </property>
-        <property name="sizeConstraint">
-         <enum>QLayout::SetDefaultConstraint</enum>
-        </property>
-        <item>
-         <widget class="QLineEdit" name="rangeSelect">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="buttonVisualize">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Visualize</string>
-          </property>
-          <property name="autoDefault">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QProgressBar" name="progressBar">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="value">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="buttonResetView">
-          <property name="text">
-           <string>Reset View</string>
-          </property>
-          <property name="shortcut">
-           <string>R</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="1">
-           <widget class="QCheckBox" name="checkBoxLabels">
-            <property name="text">
-             <string>Show labels</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkboxContours">
-            <property name="text">
-             <string>Show contours</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="filtersLabel">
-          <property name="text">
-           <string>Filters:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="maxSimLabel">
-            <property name="text">
-             <string>Max similarity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="maxSimilarity">
-            <property name="decimals">
-             <number>4</number>
-            </property>
-            <property name="maximum">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.005000000000000</double>
-            </property>
-            <property name="value">
-             <double>1.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="minSimLabel">
-            <property name="text">
-             <string>Min similarity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="minSimilarity">
-            <property name="decimals">
-             <number>4</number>
-            </property>
-            <property name="maximum">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.005000000000000</double>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBoxPlanes">
-          <property name="text">
-           <string>Show Planes</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBoxDelete">
-          <property name="text">
-           <string>Delete filtered</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="selectionLabel">
-            <property name="text">
-             <string>Selection:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="buttonClearSelect">
-            <property name="text">
-             <string>Clear selection</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="2" column="1">
-           <widget class="QPushButton" name="buttonSelectSim">
-            <property name="toolTip">
-             <string>First Select</string>
-            </property>
-            <property name="text">
-             <string>First selected</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QCheckBox" name="checkBoxMultiSelect">
-            <property name="text">
-             <string>MultiSelect</string>
-            </property>
-            <property name="shortcut">
-             <string>M</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBoxSelect">
-            <property name="text">
-             <string>Select segment</string>
-            </property>
-            <property name="shortcut">
-             <string>S</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="buttonMeanSim">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>Mean similarity</string>
-            </property>
-            <property name="text">
-             <string>Mean similarity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QCheckBox" name="checkBoxOnlySelected">
-            <property name="text">
-             <string>Show only selected</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QTreeWidget" name="segmentsTree">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>202</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <column>
-           <property name="text">
-            <string>Segments</string>
+  <widget class="QSplitter" name="centralSplitter">
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="opaqueResize">
+    <bool>true</bool>
+   </property>
+   <property name="handleWidth">
+    <number>6</number>
+   </property>
+   <property name="childrenCollapsible">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="layoutWidget">
+    <layout class="QVBoxLayout" name="mainLayout">
+     <item>
+      <widget class="QSplitter" name="splitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QWidget" name="layoutWidget">
+        <layout class="QHBoxLayout" name="imageLayout">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="objImage">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Value</string>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>321</height>
+            </size>
            </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="0" column="1">
-       <spacer name="hrSpacer_1">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Preferred</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="0">
-       <widget class="QVTKWidget" name="qvtkWidget" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>640</width>
-          <height>480</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>CrossCursor</cursorShape>
-        </property>
+           <property name="text">
+            <string>Objects ground truth</string>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="supImage">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>321</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Generated superpixels</string>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
+       <widget class="QWidget" name="layoutWidget">
+        <layout class="QHBoxLayout" name="listLayout">
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="QListWidget" name="imgList">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QListWidget" name="segList">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <layout class="QVBoxLayout" name="optionsLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinimumSize</enum>
+     </property>
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="loadDataButton">
+       <property name="text">
+        <string>&amp;Load &amp;&amp; View data</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="optionsLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>160</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Superpixels algorithm options</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="runButton">
+         <property name="text">
+          <string>Run</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="saveButton">
+         <property name="text">
+          <string>Save</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+    <zorder>optionsLabel</zorder>
+    <zorder>line</zorder>
+    <zorder>line_2</zorder>
+    <zorder>loadDataButton</zorder>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1025</width>
-     <height>21</height>
+     <width>1000</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Dataset</string>
     </property>
-    <addaction name="actionLoad_data"/>
+    <addaction name="actionBerkeley_dataset"/>
+    <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuSettings">
+   <widget class="QMenu" name="menuNavigation">
     <property name="title">
-     <string>Settings</string>
+     <string>Navigation</string>
     </property>
-    <widget class="QMenu" name="menuColors">
-     <property name="title">
-      <string>Colors</string>
-     </property>
-     <widget class="QMenu" name="menuFilterPlane_color">
-      <property name="title">
-       <string>Filter plane color</string>
-      </property>
-      <addaction name="actionFilterMax_color"/>
-      <addaction name="actionFilterMin_color"/>
-     </widget>
-     <addaction name="actionContour_color"/>
-     <addaction name="menuFilterPlane_color"/>
-     <addaction name="actionFSelected_color"/>
-     <addaction name="actionNSelected_color"/>
-    </widget>
-     <!--
-    <widget class="QMenu" name="menuLabels">
-     <property name="title">
-      <string>Labels</string>
-     </property>
-     <addaction name="actionShow_only_selected"/>
-    </widget>
-    -->
-    <widget class="QMenu" name="menuView">
-     <property name="title">
-      <string>View</string>
-     </property>
-     <addaction name="actionHide_0_Similarity"/>
-    </widget>
-    <addaction name="menuColors"/>
-    <!--<addaction name="menuLabels"/>-->
-    <addaction name="menuView"/>
+    <addaction name="actionNext"/>
+    <addaction name="actionBack"/>
+   </widget>
+   <widget class="QMenu" name="menuSave_options">
+    <property name="title">
+     <string>Save options</string>
+    </property>
+    <addaction name="actionSave_Folder"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuSettings"/>
+   <addaction name="menuSave_options"/>
+   <addaction name="menuNavigation"/>
   </widget>
+  <action name="actionBerkeley_dataset">
+   <property name="text">
+    <string>Berkeley BSD</string>
+   </property>
+  </action>
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionHelp">
+  <action name="actionNext">
    <property name="text">
-    <string>Help</string>
+    <string>Next</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Right</string>
    </property>
   </action>
-  <action name="actionSave">
+  <action name="actionBack">
    <property name="text">
-    <string>Save</string>
+    <string>Back</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Left</string>
    </property>
   </action>
-  <action name="actionLoad_data">
+  <action name="actionLoad_globals">
    <property name="text">
-    <string>Load data</string>
+    <string>Load Globals</string>
    </property>
   </action>
-  <action name="actionContour_color">
+  <action name="actionSave_Folder">
    <property name="text">
-    <string>Contour color</string>
-   </property>
-  </action>
-  <action name="actionFSelected_color">
-   <property name="text">
-    <string>First selected color</string>
-   </property>
-  </action>
-  <action name="actionNSelected_color">
-   <property name="text">
-    <string>Others selected color</string>
-   </property>
-  </action>
-  <action name="actionFilterMin_color">
-   <property name="text">
-    <string>Min</string>
-   </property>
-  </action>
-  <action name="actionFilterMax_color">
-   <property name="text">
-    <string>Max</string>
-   </property>
-  </action>
-  <!--<action name="actionShow_only_selected">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Show only selected</string>
-   </property>
-  </action>-->
-  <action name="actionHide_0_Similarity">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Hide 0 Similarity</string>
+    <string>Select Folder</string>
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QVTKWidget</class>
-   <extends>QWidget</extends>
-   <header>QVTKWidget.h</header>
-  </customwidget>
- </customwidgets>
+ <tabstops>
+  <tabstop>imgList</tabstop>
+  <tabstop>segList</tabstop>
+  <tabstop>runButton</tabstop>
+  <tabstop>saveButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
- <designerdata>
-  <property name="gridDeltaX">
-   <number>2</number>
-  </property>
-  <property name="gridDeltaY">
-   <number>2</number>
-  </property>
-  <property name="gridSnapX">
-   <bool>true</bool>
-  </property>
-  <property name="gridSnapY">
-   <bool>true</bool>
-  </property>
-  <property name="gridVisible">
-   <bool>false</bool>
-  </property>
- </designerdata>
 </ui>

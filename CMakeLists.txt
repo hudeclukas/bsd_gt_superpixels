@@ -31,6 +31,8 @@ add_executable(ImageSplitterSuperpixels
 
 target_link_libraries(ImageSplitterSuperpixels 
   ${OpenCV_LIBS}
+  SplitterGUI
+  SplitterALGO
   Qt5::Widgets
   Qt5::Gui
   Qt5::Core

@@ -12,10 +12,15 @@ include_directories(
 
 set(SOURCE_FILES
   MainSplitterGUI.cpp
+  Berkeley.cpp
+  DirIO.cpp
 )
 
 set(HEADER_FILES
   MainSplitterGUI.h
+  Dataset.h
+  Berkeley.h
+  DirIO.h
 )
 
 set(UI_FORMS
