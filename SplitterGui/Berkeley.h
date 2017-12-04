@@ -4,12 +4,14 @@
 #include "Dataset.h"
 #include <map>
 
+
 class QMenu;
 
 struct SaveOptions
 {
     QString Path = "";
-    QString Name = "";
+    QString Prefix = "";
+    QString Image = "";
     QString Extension = "";
     int Counter = 0;
 };
@@ -28,9 +30,14 @@ public:
     void loadGroundTruth();
     
     void changeSavePattern() override;
+    void setSaveCounter(int value) override;
 
     QMenu* getDatasetMenu() override;
     std::map<QString, ImageData> getLoadedData() override;
+    void drawSegments(const cv::Mat& input, cv::Mat& output, QString& ground_truth_path);
+    cv::Mat getSegmentedImage(QString image, int segmentation) override;
+    void resetData() override;
+    void saveSegment2SuperpixelLabels(cv::Mat image) override;
 
 
 private:

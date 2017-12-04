@@ -156,6 +156,22 @@
       </widget>
      </item>
      <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item alignment="Qt::AlignHCenter">
       <widget class="QLabel" name="optionsLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -188,34 +204,132 @@
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="horizontalSpacing">
+        <number>7</number>
        </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Expanding</enum>
+       <property name="verticalSpacing">
+        <number>10</number>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
+       <item row="1" column="0">
+        <widget class="QLabel" name="regionSizeLbl">
+         <property name="text">
+          <string>LSC - region &amp;size</string>
+         </property>
+         <property name="buddy">
+          <cstring>regionSizeVal</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="ratioLbl">
+         <property name="text">
+          <string>LSC - &amp;ratio</string>
+         </property>
+         <property name="buddy">
+          <cstring>ratioVal</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="connectivityLbl">
+         <property name="text">
+          <string>LSC - &amp;connectivity</string>
+         </property>
+         <property name="buddy">
+          <cstring>connectivityVal</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="regionSizeVal">
+         <property name="minimum">
+          <number>4</number>
+         </property>
+         <property name="maximum">
+          <number>9999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QDoubleSpinBox" name="ratioVal">
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.005000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QSpinBox" name="connectivityVal"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="iterationsLbl">
+         <property name="text">
+          <string>LSC - &amp;iterations</string>
+         </property>
+         <property name="buddy">
+          <cstring>iterationsVal</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="iterationsVal">
+         <property name="maximum">
+          <number>1000</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QPushButton" name="runButton">
          <property name="text">
-          <string>Run</string>
+          <string>Ru&amp;n</string>
+         </property>
+         <property name="default">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="saveButton">
+        <widget class="QPushButton" name="autoRunSaveButton">
          <property name="text">
-          <string>Save</string>
+          <string>Auto run</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="saveButton">
+           <property name="text">
+            <string>Save</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="saveCount">
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="saveLbl">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -226,6 +340,7 @@
     <zorder>line</zorder>
     <zorder>line_2</zorder>
     <zorder>loadDataButton</zorder>
+    <zorder>verticalSpacer</zorder>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -234,7 +349,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -301,8 +416,15 @@
  <tabstops>
   <tabstop>imgList</tabstop>
   <tabstop>segList</tabstop>
+  <tabstop>loadDataButton</tabstop>
   <tabstop>runButton</tabstop>
+  <tabstop>iterationsVal</tabstop>
+  <tabstop>regionSizeVal</tabstop>
+  <tabstop>ratioVal</tabstop>
+  <tabstop>connectivityVal</tabstop>
   <tabstop>saveButton</tabstop>
+  <tabstop>saveCount</tabstop>
+  <tabstop>autoRunSaveButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

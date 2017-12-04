@@ -4,9 +4,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(SGUI_SRC "${SplitterGUI_SOURCE_DIR}")
+message("SGUI_SRC ${SGUI_SRC}")
+message("SALGO_SRC ${SALGO_SRC}")
 
 include_directories( 
+  ${CMAKE_SOURCE_DIR}
   ${OpenCV_INCLUDE_DIRS}
 )
 
@@ -19,6 +21,7 @@ set(SOURCE_FILES
 set(HEADER_FILES
   MainSplitterGUI.h
   Dataset.h
+  Converter.h
   Berkeley.h
   DirIO.h
 )
@@ -30,15 +33,16 @@ set(UI_FORMS
 qt5_wrap_ui(UI_HEADERS ${UI_FORMS})
 
 
-add_library(SplitterGUI
+add_library(SplitterGUI STATIC
   ${SOURCE_FILES}
   ${HEADER_FILES}
   ${UI_HEADERS}  
   ${WIN_RESOURCE_FILE}
 )
 
-target_link_libraries(SplitterGUI LINK_PUBLIC
+target_link_libraries(SplitterGUI PUBLIC
   ${OpenCV_LIBS}
+  SplitterALGO
   Qt5::Widgets
   Qt5::Gui
   Qt5::Core

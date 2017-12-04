@@ -1,6 +1,10 @@
 #ifndef MAINSPLITTERGUI_H
 #define MAINSPLITTERGUI_H
+
 #include <QMainWindow>
+#include <opencv2/core/base.hpp>
+#include "SplitterAlgo/Splitter.h"
+#include <qlabel.h>
 
 class Ui_SplitterGUI;
 class Dataset;
@@ -20,16 +24,27 @@ public:
     void on_LoadAndViewData();
 
     void change_ImageListSelected();
+    void setImageTo(cv::Mat mimage, QLabel* object);
+    void change_SegListSelected();
+
+    void runSuperpixel();
+    void saveSuperpixels();
+
+    void autoRun();
 
 private:
     Ui_SplitterGUI *ui;
 
     Dataset *dataset_;
 
-
+    Splitter splitter;
 
     void unloadDatasetActions();
     void initCentralSplitter();
+    void initSuperpixelOptions();
+    void setRunEnabled(bool enable);
+    void increaseCounter();
+    void resetCounter();
 
 };
 #endif // MAINSPLITTERGUI_H
