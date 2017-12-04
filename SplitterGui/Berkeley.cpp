@@ -220,7 +220,9 @@ void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
 
     QString fileName = saveOptions.Path + "/" + saveOptions.Prefix + "_" + saveOptions.Image + "_" + QString::number(saveOptions.Counter) + ".sup";
     QString imageName = saveOptions.Path + "/" + saveOptions.Prefix + "_" + saveOptions.Image + "_" + QString::number(saveOptions.Counter) + "." + saveOptions.Extension;
-    cv::imwrite(imageName.toStdString(), superpixelsLabels);
+    cv::Mat tmp;
+    superpixelsLabels.convertTo(tmp, CV_16UC1);
+    cv::imwrite(imageName.toStdString(), tmp);
     std::ofstream saveTo(fileName.toStdString());
     
     for (auto col = 0; col < max1; ++col)
