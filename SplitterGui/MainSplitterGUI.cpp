@@ -6,6 +6,8 @@
 #include "Converter.h"
 
 #include <iostream>
+#include <opencv2/ximgproc/seeds.hpp>
+#include <fstream>
 
 MainSplitterGUI::MainSplitterGUI() : dataset_(nullptr)
 {
@@ -16,6 +18,9 @@ MainSplitterGUI::MainSplitterGUI() : dataset_(nullptr)
     setRunEnabled(false);
     initSuperpixelOptions();
 
+    setLSCvisible(true);
+    setSEEDSvisible(false);
+
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(on_actionExit()));
     connect(ui->actionNext, SIGNAL(triggered()), this, SLOT(on_next()));
     connect(ui->actionBack, SIGNAL(triggered()), this, SLOT(on_previous()));
@@ -23,6 +28,7 @@ MainSplitterGUI::MainSplitterGUI() : dataset_(nullptr)
     connect(ui->loadDataButton, SIGNAL(clicked()), this, SLOT(on_LoadAndViewData()));
     connect(ui->imgList, SIGNAL(itemSelectionChanged()), this, SLOT(change_ImageListSelected()));
     connect(ui->segList, SIGNAL(itemSelectionChanged()), this, SLOT(change_SegListSelected()));
+    connect(ui->algorithmBox, SIGNAL(currentIndexChanged(int)), this, SLOT(change_AlgorithmSelection(int)));
     connect(ui->runButton, SIGNAL(clicked()), this, SLOT(runSuperpixel()));
     connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(saveSuperpixels()));
 
@@ -139,22 +145,48 @@ void MainSplitterGUI::change_SegListSelected()
     setImageTo(mimage, ui->objImage);
 }
 
+void MainSplitterGUI::change_AlgorithmSelection(int algo)
+{
+    splitter.superpixelAlgorithm(static_cast<Splitter::Algorithm>(algo));
+    if (algo == Splitter::Algorithm::LSC)
+    {
+        setLSCvisible(true);
+        setSEEDSvisible(false);
+    }
+    if (algo == Splitter::Algorithm::SEEDS)
+    {
+        setLSCvisible(false);
+        setSEEDSvisible(true);
+    }
+}
+
 void MainSplitterGUI::runSuperpixel()
 {
-    int region_size = ui->regionSizeVal->value();
-    float ratio = ui->ratioVal->value();
-    int connectivity = ui->connectivityVal->value();
-    splitter.setRatio(ratio);
-    splitter.setRegionSize(region_size);
-    splitter.setConnectivityMinElement(connectivity);
+    if (ui->algorithmBox->currentIndex() == Splitter::Algorithm::LSC)
+    {
+        int region_size = ui->regionSizeVal->value();
+        float ratio = ui->ratioVal->value();
+        int connectivity = ui->connectivityVal->value();
+        splitter.setRatio(ratio);
+        splitter.setRegionSize(region_size);
+        splitter.setConnectivityMinElement(connectivity);
+    }
+    if (ui->algorithmBox->currentIndex() == Splitter::Algorithm::SEEDS)
+    {
+        int number = ui->seedsNumberVal->value();
+        int levels = ui->seedsLevelVal->value();
+        int prior = ui->seedsPriorVal->value();
 
+        splitter.setNumberOfSuperpixels(number);
+        splitter.setLevels(levels);
+        splitter.setPrior(prior);
+    }
     if (dataset_->segments().empty())
     {
         ui->segList->setCurrentRow(0);
     }
 
     auto input = dataset_->segments();
-    
     cv::Mat output;
     splitter.run(input, output);
     setImageTo(output, ui->supImage);
@@ -184,11 +216,38 @@ void MainSplitterGUI::autoRun()
             saveSuperpixels();
             counter++;
             dataset_->setSaveCounter(counter);
+            if (!ui->useAllAnotations->isChecked())
+            {
+                break;
+            }
         }
     }
     ui->saveCount->setValue(counter);
     connect(ui->imgList, SIGNAL(itemSelectionChanged()), this, SLOT(change_ImageListSelected()));
     connect(ui->segList, SIGNAL(itemSelectionChanged()), this, SLOT(change_SegListSelected()));
+}
+
+void MainSplitterGUI::setLSCvisible(bool visible)
+{
+    ui->iterationsVal->setVisible(visible);
+    ui->regionSizeVal->setVisible(visible);
+    ui->ratioVal->setVisible(visible);
+    ui->connectivityVal->setVisible(visible);
+    ui->iterationsLbl->setVisible(visible);
+    ui->regionSizeLbl->setVisible(visible);
+    ui->ratioLbl->setVisible(visible);
+    ui->connectivityLbl->setVisible(visible);
+}
+
+void MainSplitterGUI::setSEEDSvisible(bool visible)
+{
+    ui->seedsLevelLbl->setVisible(visible);
+    ui->seedsNumberLbl->setVisible(visible);
+    ui->seedsPriorLbl->setVisible(visible);
+    ui->seedsLevelVal->setVisible(visible);
+    ui->seedsNumberVal->setVisible(visible);
+    ui->seedsPriorVal->setVisible(visible);
+
 }
 
 void MainSplitterGUI::unloadDatasetActions()
@@ -206,6 +265,9 @@ void MainSplitterGUI::initSuperpixelOptions()
     ui->regionSizeVal->setValue(splitter.getRegionSize());
     ui->ratioVal->setValue(splitter.getRatio());
     ui->connectivityVal->setValue(splitter.getConectivityMinElement());
+    ui->seedsNumberVal->setValue(splitter.getNumberOfSuperpixels());
+    ui->seedsLevelVal->setValue(splitter.getLevels());
+    ui->seedsPriorVal->setValue(splitter.getPrior());
 }
 
 void MainSplitterGUI::setRunEnabled(bool enable)

@@ -26,6 +26,7 @@ public:
     void change_ImageListSelected();
     void setImageTo(cv::Mat mimage, QLabel* object);
     void change_SegListSelected();
+    void change_AlgorithmSelection(int algo);
 
     void runSuperpixel();
     void saveSuperpixels();
@@ -38,6 +39,9 @@ private:
     Dataset *dataset_;
 
     Splitter splitter;
+
+    void setLSCvisible(bool visible);
+    void setSEEDSvisible(bool visible);
 
     void unloadDatasetActions();
     void initCentralSplitter();

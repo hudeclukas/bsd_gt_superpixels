@@ -23,7 +23,6 @@ public:
     Berkeley();
     ~Berkeley();
 
-
     public slots:
     void loadTrainData();
     void loadTestData();
@@ -38,7 +37,6 @@ public:
     cv::Mat getSegmentedImage(QString image, int segmentation) override;
     void resetData() override;
     void saveSegment2SuperpixelLabels(cv::Mat image) override;
-
 
 private:
     QMenu *menu;

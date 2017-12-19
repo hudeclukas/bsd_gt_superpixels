@@ -109,17 +109,17 @@ void Berkeley::drawSegments(const cv::Mat& input, cv::Mat& output, QString& grou
     }
     
     input.copyTo(output);
-    lastBerkeleyLabelsMask = cv::Mat::zeros(input.rows, input.cols, CV_32SC1);
+    lastLabelsMask = cv::Mat::zeros(input.rows, input.cols, CV_32SC1);
     lastEdgesMask = cv::Mat::zeros(input.rows, input.cols, CV_8UC1);
     for (int label, row, col_s, col_e; segFile >> label >> row >> col_s >> col_e; )
     {
         auto inPtr = input.ptr<cv::Vec3b>(row);
         auto oPtr = output.ptr<cv::Vec3b>(row);
-        auto mPtr = lastBerkeleyLabelsMask.ptr<int>(row);
+        auto mPtr = lastLabelsMask.ptr<int>(row);
         auto ePtr = lastEdgesMask.ptr<uchar>(row);
         if (row > 0)
         {
-            auto upMRow = lastBerkeleyLabelsMask.ptr<int>(row-1);
+            auto upMRow = lastLabelsMask.ptr<int>(row-1);
             for (int col = col_s; col <= col_e; ++col)
             {
                 auto upVal = upMRow[col];
@@ -186,33 +186,67 @@ void Berkeley::resetData()
 
 void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
 {
-    assert(superpixelsLabels.size == lastBerkeleyLabelsMask.size);
+    assert(superpixelsLabels.size == lastLabelsMask.size);
     
-    double max1, max2;
-    cv::minMaxIdx(superpixelsLabels, nullptr, &max1);
-    cv::minMaxIdx(lastBerkeleyLabelsMask, nullptr, &max2);
-    max1++;
-    max2++;
+    double maxSups, maxBerks;
+    cv::minMaxIdx(superpixelsLabels, nullptr, &maxSups);
+    cv::minMaxIdx(lastLabelsMask, nullptr, &maxBerks);
+    maxSups++;
+    maxBerks++;
 
+    Image image;
+    image.name = saveOptions.Image;
     std::vector<std::vector<int>> label2label;
-    for (int i = 0; i < max2; ++i)
+    for (int i = 0; i < maxBerks; ++i)
     {
-        label2label.push_back(std::vector<int>(max1, 0));
+        label2label.push_back(std::vector<int>(maxSups, 0));
+        image.objects.push_back(Image::ImageObject(maxSups));
     }
 
     for (auto row = 0; row < superpixelsLabels.rows; ++row)
     {
-        auto lPtr = lastBerkeleyLabelsMask.ptr<int>(row);
+        auto bPtr = lastLabelsMask.ptr<int>(row);
         auto sPtr = superpixelsLabels.ptr<int>(row);
+        auto iPtr = lastLoadedImage.ptr<cv::Vec3b>(row);
         for (auto col = 0; col < superpixelsLabels.cols; ++col)
         {
-            if (lPtr[col] != -1)
+            if (bPtr[col] != -1)
             {
-                label2label[lPtr[col]][sPtr[col]]++;
+                label2label[bPtr[col]][sPtr[col]]++;
+                image.objects[bPtr[col]][sPtr[col]].pixels.push_back({ row, col, iPtr[col] });
+                image.objects[bPtr[col]][sPtr[col]].label = sPtr[col];
+            } else
+            {
+                bool done = false;
+                for (int i = 0; i < image.objects.size(); ++i)
+                {
+                    for (auto && superpixel : image.objects[i])
+                    {
+                        if (superpixel.label == sPtr[col])
+                        {
+                            superpixel.invalidCount++;
+                            if (superpixel.invalidCount > 10)
+                            {
+                                superpixel.isValid = false;
+                            }
+                            done = true;
+                            break;
+                        }
+                    }
+                    if (done) break;
+                }
             }
         }
     }
-    
+
+    for (auto && superpixels : image.objects)
+    {
+        for (auto && sp : superpixels)
+        {
+            sp.createSuperpixelMat();
+        }
+    }
+
     if (saveOptions.Path.isEmpty())
     {
         changeSavePattern();
@@ -225,17 +259,17 @@ void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
     cv::imwrite(imageName.toStdString(), tmp);
     std::ofstream saveTo(fileName.toStdString());
     
-    for (auto col = 0; col < max1; ++col)
+    for (auto col = 0; col < maxSups; ++col)
     {
         int maxcount = 0;
-        for (auto row = 0; row < max2; ++row)
+        for (auto row = 0; row < maxBerks; ++row)
         {
             if (label2label[row][col] >= maxcount)
             {
                 maxcount = label2label[row][col];
             }
         }
-        for (auto row = 0; row < max2; ++row)
+        for (auto row = 0; row < maxBerks; ++row)
         {
             if (label2label[row][col] < maxcount)
             {

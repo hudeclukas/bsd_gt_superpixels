@@ -204,7 +204,21 @@
       </widget>
      </item>
      <item>
-      <layout class="QFormLayout" name="formLayout">
+      <widget class="QComboBox" name="algorithmBox">
+       <item>
+        <property name="text">
+         <string>LSC</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>SEEDS</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <layout class="QFormLayout" name="lscOptionsLayout">
        <property name="horizontalSpacing">
         <number>7</number>
        </property>
@@ -284,7 +298,69 @@
       </layout>
      </item>
      <item>
+      <layout class="QFormLayout" name="seedsOptionsLayout">
+       <item row="1" column="0">
+        <widget class="QLabel" name="seedsNumberLbl">
+         <property name="text">
+          <string>SEEDS - &amp;number of sups.</string>
+         </property>
+         <property name="buddy">
+          <cstring>seedsNumberVal</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="seedsNumberVal">
+         <property name="maximum">
+          <number>99999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="seedsLevelLbl">
+         <property name="text">
+          <string>SEEDS - l&amp;evels</string>
+         </property>
+         <property name="buddy">
+          <cstring>seedsLevelVal</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="seedsPriorLbl">
+         <property name="text">
+          <string>SEEDS - &amp;prior</string>
+         </property>
+         <property name="buddy">
+          <cstring>seedsPriorVal</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QSpinBox" name="seedsLevelVal">
+         <property name="maximum">
+          <number>9999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QSpinBox" name="seedsPriorVal">
+         <property name="maximum">
+          <number>100</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QCheckBox" name="useAllAnotations">
+         <property name="text">
+          <string>Use all anotated data</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QPushButton" name="runButton">
          <property name="text">
@@ -341,6 +417,7 @@
     <zorder>line_2</zorder>
     <zorder>loadDataButton</zorder>
     <zorder>verticalSpacer</zorder>
+    <zorder>algorithmBox</zorder>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

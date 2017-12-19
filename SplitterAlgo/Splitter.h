@@ -3,11 +3,32 @@
 
 #include <opencv2/core/mat.hpp>
 
+struct SeedsOptions
+{
+    int number_of_superpixels = 400;
+    int levels = 8;
+    int prior = 2;
+};
+
+struct LscOptions
+{
+    int region_size = 20;
+    float ratio = 0.05f;
+    int conectivity_min_element = 10;
+    int num_iterations = 30;
+};
+
 class Splitter
 {
 public:
+    enum Algorithm
+    {
+        LSC, SEEDS
+    };
     Splitter();
     ~Splitter();
+
+    void superpixelAlgorithm(Algorithm algo);
 
     cv::Mat run(const cv::Mat& input, cv::Mat& output);
     void setRegionSize(const int value);
@@ -20,16 +41,21 @@ public:
     int getConectivityMinElement() const;
     int getNumberOfIterations() const;
 
+    void setNumberOfSuperpixels(int value);
+    void setLevels(int value);
+    void setPrior(int value);
+
+    int getNumberOfSuperpixels();
+    int getLevels();
+    int getPrior();
+
     cv::Mat getLabels();
 private:
-    int lsc_region_size = 20;
-    float lsc_ratio = 0.05f;
-    int lsc_conectivity_min_element = 10;
-    int lsc_num_iterations = 30;
-
+    SeedsOptions seeds_options_;
+    LscOptions lsc_options_;
 
     cv::Mat superpixelsLabels;
-
-
+    
+    Algorithm algo = LSC;
 };
 #endif // SPLITTER_H
