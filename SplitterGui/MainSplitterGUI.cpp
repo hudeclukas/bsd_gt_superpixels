@@ -20,6 +20,7 @@ MainSplitterGUI::MainSplitterGUI() : dataset_(nullptr)
 
     setLSCvisible(true);
     setSEEDSvisible(false);
+    setSQUARESvisible(false);
 
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(on_actionExit()));
     connect(ui->actionNext, SIGNAL(triggered()), this, SLOT(on_next()));
@@ -152,11 +153,19 @@ void MainSplitterGUI::change_AlgorithmSelection(int algo)
     {
         setLSCvisible(true);
         setSEEDSvisible(false);
+        setSQUARESvisible(false);
     }
     if (algo == Splitter::Algorithm::SEEDS)
     {
         setLSCvisible(false);
         setSEEDSvisible(true);
+        setSQUARESvisible(false);
+    }
+    if (algo == Splitter::Algorithm::SQUARES)
+    {
+        setLSCvisible(false);
+        setSEEDSvisible(false);
+        setSQUARESvisible(true);
     }
 }
 
@@ -181,6 +190,13 @@ void MainSplitterGUI::runSuperpixel()
         splitter.setLevels(levels);
         splitter.setPrior(prior);
     }
+    if (ui->algorithmBox->currentIndex() == Splitter::Algorithm::SQUARES)
+    {
+        int size = ui->squaresSizeVal->value();
+        double shift = ui->squaresShiftVal->value();
+        splitter.setSquareSize(size);
+        splitter.setSquareShift(shift);
+    }
     if (dataset_->segments().empty())
     {
         ui->segList->setCurrentRow(0);
@@ -188,13 +204,20 @@ void MainSplitterGUI::runSuperpixel()
 
     auto input = dataset_->segments();
     cv::Mat output;
-    splitter.run(input, output);
+    splitter.run(input, output, dataset_->mask());
     setImageTo(output, ui->supImage);
 }
 
 void MainSplitterGUI::saveSuperpixels()
 {
-    dataset_->saveSegment2SuperpixelLabels(splitter.getLabels());
+    if (splitter.superpixelAlgorithm() == Splitter::SQUARES)
+    {
+        dataset_->saveSegment2SuperpixelLabels(splitter.getSquares());
+    }
+    else
+    {
+        dataset_->saveSegment2SuperpixelLabels(splitter.getLabels());
+    }
     increaseCounter();
 }
 
@@ -250,6 +273,14 @@ void MainSplitterGUI::setSEEDSvisible(bool visible)
 
 }
 
+void MainSplitterGUI::setSQUARESvisible(bool visible)
+{
+    ui->squaresSizeLbl->setVisible(visible);
+    ui->squaresSizeVal->setVisible(visible);
+    ui->squaresShiftLbl->setVisible(visible);
+    ui->squaresShiftVal->setVisible(visible);
+}
+
 void MainSplitterGUI::unloadDatasetActions()
 {
 }
@@ -268,6 +299,8 @@ void MainSplitterGUI::initSuperpixelOptions()
     ui->seedsNumberVal->setValue(splitter.getNumberOfSuperpixels());
     ui->seedsLevelVal->setValue(splitter.getLevels());
     ui->seedsPriorVal->setValue(splitter.getPrior());
+    ui->squaresSizeVal->setValue(splitter.getSquareSize());
+    ui->squaresShiftVal->setValue(splitter.getSquareShift());
 }
 
 void MainSplitterGUI::setRunEnabled(bool enable)

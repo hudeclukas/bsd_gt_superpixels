@@ -7,10 +7,12 @@ include_directories(
 
 set(SOURCE_FILES
   Splitter.cpp
+  Squares.cpp
 )
 
 set(HEADER_FILES
   Splitter.h
+  Squares.h
 )
 
 add_library(SplitterALGO STATIC

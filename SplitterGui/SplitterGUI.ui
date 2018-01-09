@@ -215,6 +215,11 @@
          <string>SEEDS</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>SQUARES</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
@@ -299,7 +304,7 @@
      </item>
      <item>
       <layout class="QFormLayout" name="seedsOptionsLayout">
-       <item row="1" column="0">
+       <item row="0" column="0">
         <widget class="QLabel" name="seedsNumberLbl">
          <property name="text">
           <string>SEEDS - &amp;number of sups.</string>
@@ -309,14 +314,14 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="0" column="1">
         <widget class="QSpinBox" name="seedsNumberVal">
          <property name="maximum">
           <number>99999</number>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="seedsLevelLbl">
          <property name="text">
           <string>SEEDS - l&amp;evels</string>
@@ -326,7 +331,14 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="seedsLevelVal">
+         <property name="maximum">
+          <number>9999</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
         <widget class="QLabel" name="seedsPriorLbl">
          <property name="text">
           <string>SEEDS - &amp;prior</string>
@@ -337,16 +349,47 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QSpinBox" name="seedsLevelVal">
-         <property name="maximum">
-          <number>9999</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
         <widget class="QSpinBox" name="seedsPriorVal">
          <property name="maximum">
           <number>100</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QFormLayout" name="squaresOptionsLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="squaresSizeLbl">
+         <property name="text">
+          <string>SQUARES - si&amp;ze</string>
+         </property>
+         <property name="buddy">
+          <cstring>squaresSizeVal</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="squaresSizeVal">
+         <property name="maximum">
+          <number>100</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="squaresShiftLbl">
+         <property name="text">
+          <string>SQUARES - shift %</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="squaresShiftVal">
+         <property name="maximum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
          </property>
         </widget>
        </item>
@@ -491,9 +534,8 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>imgList</tabstop>
   <tabstop>segList</tabstop>
-  <tabstop>loadDataButton</tabstop>
+  <tabstop>imgList</tabstop>
   <tabstop>runButton</tabstop>
   <tabstop>iterationsVal</tabstop>
   <tabstop>regionSizeVal</tabstop>
@@ -502,6 +544,10 @@
   <tabstop>saveButton</tabstop>
   <tabstop>saveCount</tabstop>
   <tabstop>autoRunSaveButton</tabstop>
+  <tabstop>algorithmBox</tabstop>
+  <tabstop>useAllAnotations</tabstop>
+  <tabstop>squaresSizeVal</tabstop>
+  <tabstop>loadDataButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

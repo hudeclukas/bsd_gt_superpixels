@@ -37,8 +37,11 @@ public:
     cv::Mat getSegmentedImage(QString image, int segmentation) override;
     void resetData() override;
     void saveSegment2SuperpixelLabels(cv::Mat image) override;
+    void saveSegment2SuperpixelLabels(std::map<int, std::vector<cv::Mat>> obj_patches) override;
 
 private:
+    void buildObjectFileName(QString& fileName);
+    
     QMenu *menu;
     QString trainDataDirPath = "";
     std::vector<QString> trainFiles;

@@ -8,8 +8,7 @@
 #include "DirIO.h"
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <fstream>
+//#include <fstream>
 
 Berkeley::Berkeley()
 {
@@ -184,6 +183,21 @@ void Berkeley::resetData()
     matchedData.clear();
 }
 
+void Berkeley::buildObjectFileName(QString& fileName)
+{
+    auto imgData = matchedData[saveOptions.Image];
+    fileName = saveOptions.Path + "/";
+    if (imgData.type == ImageData::TRAIN)
+    {
+        fileName += "train/";
+    }
+    else if (imgData.type == ImageData::TEST)
+    {
+        fileName += "test/";
+    }
+    fileName += saveOptions.Prefix + "_" + saveOptions.Image + "_" + QString::number(saveOptions.Counter) + "." + saveOptions.Extension;
+}
+
 void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
 {
     assert(superpixelsLabels.size == lastLabelsMask.size);
@@ -239,11 +253,27 @@ void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
         }
     }
 
-    for (auto && superpixels : image.objects)
+    for (auto objIt = image.objects.begin(); objIt < image.objects.end(); )
     {
-        for (auto && sp : superpixels)
+        for (auto supIt = objIt->begin(); supIt != objIt->end(); )
         {
-            sp.createSuperpixelMat();
+            if (supIt->pixels.size() > 20)
+            {
+                supIt->createSuperpixelMat();
+                ++supIt;
+            }
+            else
+            {
+                objIt->erase(supIt);
+            }
+        }
+        if (objIt->size() < 2)
+        {
+            image.objects.erase(objIt);
+        }
+        else
+        {
+            ++objIt;
         }
     }
 
@@ -252,36 +282,26 @@ void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
         changeSavePattern();
     }
 
-    QString fileName = saveOptions.Path + "/" + saveOptions.Prefix + "_" + saveOptions.Image + "_" + QString::number(saveOptions.Counter) + ".sup";
-    QString imageName = saveOptions.Path + "/" + saveOptions.Prefix + "_" + saveOptions.Image + "_" + QString::number(saveOptions.Counter) + "." + saveOptions.Extension;
-    cv::Mat tmp;
-    superpixelsLabels.convertTo(tmp, CV_16UC1);
-    cv::imwrite(imageName.toStdString(), tmp);
-    std::ofstream saveTo(fileName.toStdString());
+    QString fileName;
+    buildObjectFileName(fileName);
+    writeObjectFile(image, fileName);
     
-    for (auto col = 0; col < maxSups; ++col)
+    emit saved(QString("<font color='#045ae5'>" + fileName + "</font>"));
+}
+
+void Berkeley::saveSegment2SuperpixelLabels(std::map<int, std::vector<cv::Mat>> obj_patches)
+{
+    Image image(obj_patches);
+    image.name = saveOptions.Image;
+    
+    if (saveOptions.Path.isEmpty())
     {
-        int maxcount = 0;
-        for (auto row = 0; row < maxBerks; ++row)
-        {
-            if (label2label[row][col] >= maxcount)
-            {
-                maxcount = label2label[row][col];
-            }
-        }
-        for (auto row = 0; row < maxBerks; ++row)
-        {
-            if (label2label[row][col] < maxcount)
-            {
-                label2label[row][col] = 0;
-            }
-            else
-            {
-                saveTo << row << " " << col << std::endl;
-            }
-        }
+        changeSavePattern();
     }
-    saveTo.close();
-    
+
+    QString fileName;
+    buildObjectFileName(fileName);
+    writeObjectFile(image, fileName);
+
     emit saved(QString("<font color='#045ae5'>" + fileName + "</font>"));
 }

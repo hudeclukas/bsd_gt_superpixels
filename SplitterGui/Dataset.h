@@ -4,11 +4,13 @@
 #include <QObject>
 #include <QMenu>
 #include <QFileInfo>
+#include <QDir>
 
 #include <map>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <set>
+#include <fstream>
 
 struct ImageData
 {
@@ -51,7 +53,7 @@ struct Superpixel
     {
         if (!pixels.empty())
         {
-            int left = 0, up = 0, right = 0, down = 0;
+            int left = INT_MAX, up = INT_MAX, right = 0, down = 0;
             int r=0, g=0, b=0;
             for (auto && p : pixels)
             {
@@ -67,10 +69,10 @@ struct Superpixel
             g /= pixels.size();
             r /= pixels.size();
             cv::Vec3b color = { static_cast<uchar>(b),static_cast<uchar>(g),static_cast<uchar>(r) };
-            superpixelMat = cv::Mat::zeros(down - up + 1, right - left + 1, CV_8UC3) + color;
+            superpixelMat = cv::Mat::zeros(down - up + 1 + 2, right - left + 1 + 2, CV_8UC3) + color;
             for (auto && p : pixels)
             {
-                superpixelMat.at<cv::Vec3b>(p.row, p.col) = { p.b,p.g,p.r };
+                superpixelMat.at<cv::Vec3b>(p.row - up + 1, p.col - left + 1) = { p.b,p.g,p.r };
             }
         }
     }
@@ -84,6 +86,8 @@ struct Superpixel
 
 struct Image
 {
+    Image();
+    Image(std::map<int, std::vector<cv::Mat>> obj_superpixels);
     typedef std::vector<Superpixel> ImageObject;
     
     QString name;
@@ -101,11 +105,12 @@ public:
     virtual cv::Mat getSegmentedImage(QString image, int segmentation = 0) = 0;
     virtual void resetData() = 0;
     virtual void saveSegment2SuperpixelLabels(cv::Mat image) = 0;
+    virtual void saveSegment2SuperpixelLabels(std::map<int, std::vector<cv::Mat>> patches) = 0;
 
     cv::Mat readImage(QString path);
     cv::Mat image();
     cv::Mat segments();
-    cv::Mat mask();
+    cv::Mat &mask();
 
     public slots:
     virtual void changeSavePattern() = 0;
@@ -120,7 +125,28 @@ protected:
     cv::Mat lastLoadedSegment;
     cv::Mat lastLabelsMask;
     cv::Mat lastEdgesMask;
+
+    void writeObjectFile(Image image, QString fileName);
 };
+
+inline Image::Image()
+{
+}
+
+inline Image::Image(std::map<int, std::vector<cv::Mat>> obj_superpixels)
+{
+    for (auto it = obj_superpixels.begin(); it != obj_superpixels.end(); ++it)
+    {
+        Image::ImageObject iob;
+        for (auto itt = it->second.begin(); itt != it->second.end(); ++itt)
+        {
+            Superpixel sp;
+            sp.superpixelMat = *itt;
+            iob.push_back(sp);
+        }
+        this->objects.push_back(iob);
+    }
+}
 
 inline cv::Mat Dataset::readImage(QString path)
 {
@@ -139,7 +165,7 @@ inline cv::Mat Dataset::segments()
     return lastLoadedSegment;
 }
 
-inline cv::Mat Dataset::mask()
+inline cv::Mat &Dataset::mask()
 {
     return lastLabelsMask;
 }
@@ -160,7 +186,7 @@ inline std::map<QString, ImageData> MatchImage2Segmentation(std::vector<QString>
             QFileInfo seFI = QFileInfo(*its);
             QString seName = seFI.baseName();
 
-            if (seName.contains(id.name))
+            if (seName == id.name)
             {
                 matches[id.name].groundTruths.push_back(*its);
                 its = segmentations.erase(its);
@@ -174,4 +200,46 @@ inline std::map<QString, ImageData> MatchImage2Segmentation(std::vector<QString>
     return matches;
 }
 
+
+inline void Dataset::writeObjectFile(Image image, QString fileName)
+{
+    QFileInfo fi(fileName);
+    auto dir = fi.dir();
+    if (!dir.exists())
+    {
+        dir.cdUp();
+        dir.mkdir("train/");
+        dir.mkdir("test");
+    }
+    std::ofstream fo(fileName.toStdString(), std::ios_base::out | std::ios_base::binary);
+    int objectsCount = image.objects.size();
+    fo.write(reinterpret_cast<char*>(&objectsCount), sizeof objectsCount);
+    for (auto && objects : image.objects)
+    {
+        int superpixelsCount = objects.size();
+        if (superpixelsCount > 0)
+        {
+            fo.write(reinterpret_cast<char*>(&superpixelsCount), sizeof superpixelsCount);
+            for (auto && superpixel : objects)
+            {
+                auto rows = superpixel.superpixelMat.rows;
+                auto cols = superpixel.superpixelMat.cols;
+                fo.write(reinterpret_cast<char*>(&rows), sizeof rows);
+                fo.write(reinterpret_cast<char*>(&cols), sizeof cols);
+                for (auto row = 0; row < superpixel.superpixelMat.rows; row++)
+                {
+                    const auto smPtr = superpixel.superpixelMat.ptr<cv::Vec3b>(row);
+                    for (auto col = 0; col < superpixel.superpixelMat.cols; col++)
+                    {
+                        fo << smPtr[col][0];
+                        fo << smPtr[col][1];
+                        fo << smPtr[col][2];
+                    }
+                }
+            }
+        }
+
+    }
+    fo.close();
+}
 #endif // DATASET_H

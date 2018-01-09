@@ -42,6 +42,7 @@ private:
 
     void setLSCvisible(bool visible);
     void setSEEDSvisible(bool visible);
+    void setSQUARESvisible(bool visible);
 
     void unloadDatasetActions();
     void initCentralSplitter();

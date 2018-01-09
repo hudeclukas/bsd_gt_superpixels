@@ -4,6 +4,8 @@
 #include <opencv2/ximgproc/seeds.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "Squares.h"
+
 namespace cvxip = cv::ximgproc;
 
 Splitter::Splitter()
@@ -19,7 +21,12 @@ void Splitter::superpixelAlgorithm(Algorithm algo)
     this->algo = algo;
 }
 
-cv::Mat Splitter::run(const cv::Mat& in, cv::Mat& out)
+Splitter::Algorithm Splitter::superpixelAlgorithm() const
+{
+    return this->algo;
+}
+
+cv::Mat Splitter::run(const cv::Mat& in, cv::Mat& out, cv::Mat& labelsmask)
 {
     switch (algo)
     {
@@ -48,6 +55,19 @@ cv::Mat Splitter::run(const cv::Mat& in, cv::Mat& out)
             in.copyTo(out);
             out.setTo(cv::Scalar(255, 255, 0), mask);
             seeds->getLabels(superpixelsLabels);
+            return superpixelsLabels;
+        }
+        case SQUARES:
+        {
+            cv::Mat tmp;
+            in.copyTo(tmp);
+            auto squares = SuperpixelSquares(tmp, labelsmask, squares_options.size, squares_options.shift);
+            squares.iterate();
+            cv::Mat mask;
+            squares.getLabelContourMask(mask);
+            in.copyTo(out);
+            out.setTo(cv::Scalar(255, 255, 0), mask);
+            this->squares = squares.getSquares();
             return superpixelsLabels;
         }
         default :
@@ -120,9 +140,34 @@ int Splitter::getPrior()
     return seeds_options_.prior;
 }
 
+void Splitter::setSquareSize(int size)
+{
+    squares_options.size = size;
+}
+
+void Splitter::setSquareShift(double shift)
+{
+    squares_options.setShift(shift);
+}
+
+int Splitter::getSquareSize()
+{
+    return squares_options.size;
+}
+
+double Splitter::getSquareShift()
+{
+    return squares_options.shift_;
+}
+
 cv::Mat Splitter::getLabels()
 {
     return superpixelsLabels;
+}
+
+std::map<int, std::vector<cv::Mat>> Splitter::getSquares()
+{
+    return squares;
 }
 
 void Splitter::setNumberOfIterations(int value)
