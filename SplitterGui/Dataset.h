@@ -78,7 +78,7 @@ struct Superpixel
     }
 
     std::vector<Pixel> pixels;
-    uint label;
+    uint label = 0;
     int invalidCount;
     bool isValid = true;
     cv::Mat superpixelMat;
@@ -112,6 +112,8 @@ public:
     cv::Mat segments();
     cv::Mat &mask();
 
+    void setSaveSuperpixelsMask(bool save);
+
     public slots:
     virtual void changeSavePattern() = 0;
     virtual void setSaveCounter(int value) = 0;
@@ -125,6 +127,8 @@ protected:
     cv::Mat lastLoadedSegment;
     cv::Mat lastLabelsMask;
     cv::Mat lastEdgesMask;
+
+    bool saveSuperpixelsMask;
 
     void writeObjectFile(Image image, QString fileName);
 };
@@ -170,6 +174,11 @@ inline cv::Mat &Dataset::mask()
     return lastLabelsMask;
 }
 
+inline void Dataset::setSaveSuperpixelsMask(bool save)
+{
+    saveSuperpixelsMask = save;
+}
+
 inline std::map<QString, ImageData> MatchImage2Segmentation(std::vector<QString>& images, std::vector<QString> segmentations, ImageData::Type type)
 {
     std::map<QString, ImageData> matches;
@@ -209,7 +218,7 @@ inline void Dataset::writeObjectFile(Image image, QString fileName)
     {
         dir.cdUp();
         dir.mkdir("train/");
-        dir.mkdir("test");
+        dir.mkdir("test/");
     }
     std::ofstream fo(fileName.toStdString(), std::ios_base::out | std::ios_base::binary);
     int objectsCount = image.objects.size();
@@ -222,6 +231,7 @@ inline void Dataset::writeObjectFile(Image image, QString fileName)
             fo.write(reinterpret_cast<char*>(&superpixelsCount), sizeof superpixelsCount);
             for (auto && superpixel : objects)
             {
+                fo.write(reinterpret_cast<char*>(&superpixel.label), sizeof superpixel.label);
                 auto rows = superpixel.superpixelMat.rows;
                 auto cols = superpixel.superpixelMat.cols;
                 fo.write(reinterpret_cast<char*>(&rows), sizeof rows);

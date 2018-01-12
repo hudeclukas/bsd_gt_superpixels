@@ -201,7 +201,19 @@ void Berkeley::buildObjectFileName(QString& fileName)
 void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
 {
     assert(superpixelsLabels.size == lastLabelsMask.size);
-    
+    if (saveSuperpixelsMask)
+    {
+        cv::Mat tmp;
+        superpixelsLabels.convertTo(tmp, CV_16UC1);
+        tmp += 1;
+        auto path = saveOptions.Path + "/";
+        QDir dir(path);
+        if (!dir.exists("segments/"))
+        {
+            dir.mkdir("segments/");
+        }
+        cv::imwrite(path.toStdString() + "segments/" + saveOptions.Prefix.toStdString() + "_" + saveOptions.Image.toStdString() + "_" + std::to_string(saveOptions.Counter) + ".png", tmp);
+    }
     double maxSups, maxBerks;
     cv::minMaxIdx(superpixelsLabels, nullptr, &maxSups);
     cv::minMaxIdx(lastLabelsMask, nullptr, &maxBerks);
@@ -210,10 +222,8 @@ void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
 
     Image image;
     image.name = saveOptions.Image;
-    std::vector<std::vector<int>> label2label;
     for (int i = 0; i < maxBerks; ++i)
     {
-        label2label.push_back(std::vector<int>(maxSups, 0));
         image.objects.push_back(Image::ImageObject(maxSups));
     }
 
@@ -226,7 +236,6 @@ void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
         {
             if (bPtr[col] != -1)
             {
-                label2label[bPtr[col]][sPtr[col]]++;
                 image.objects[bPtr[col]][sPtr[col]].pixels.push_back({ row, col, iPtr[col] });
                 image.objects[bPtr[col]][sPtr[col]].label = sPtr[col];
             } else
@@ -257,7 +266,7 @@ void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
     {
         for (auto supIt = objIt->begin(); supIt != objIt->end(); )
         {
-            if (supIt->pixels.size() > 20)
+            if (supIt->pixels.size() > 20 && supIt->isValid)
             {
                 supIt->createSuperpixelMat();
                 ++supIt;
@@ -267,6 +276,7 @@ void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
                 objIt->erase(supIt);
             }
         }
+
         if (objIt->size() < 2)
         {
             image.objects.erase(objIt);
@@ -294,6 +304,18 @@ void Berkeley::saveSegment2SuperpixelLabels(std::map<int, std::vector<cv::Mat>> 
     Image image(obj_patches);
     image.name = saveOptions.Image;
     
+    for (auto objIt = image.objects.begin(); objIt < image.objects.end(); )
+    {
+        if (objIt->size() < 2)
+        {
+            image.objects.erase(objIt);
+        }
+        else
+        {
+            ++objIt;
+        }
+    }
+
     if (saveOptions.Path.isEmpty())
     {
         changeSavePattern();

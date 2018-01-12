@@ -30,6 +30,7 @@ public:
 
     void runSuperpixel();
     void saveSuperpixels();
+    void saveSuperpixelMask(bool save);
 
     void autoRun();
 

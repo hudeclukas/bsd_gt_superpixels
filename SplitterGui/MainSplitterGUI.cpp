@@ -32,6 +32,7 @@ MainSplitterGUI::MainSplitterGUI() : dataset_(nullptr)
     connect(ui->algorithmBox, SIGNAL(currentIndexChanged(int)), this, SLOT(change_AlgorithmSelection(int)));
     connect(ui->runButton, SIGNAL(clicked()), this, SLOT(runSuperpixel()));
     connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(saveSuperpixels()));
+    connect(ui->saveSuperpixelMask, SIGNAL(toggled(bool)), this, SLOT(saveSuperpixelMask(bool)));
 
     connect(ui->autoRunSaveButton, SIGNAL(clicked()), this, SLOT(autoRun()));
 }
@@ -221,6 +222,11 @@ void MainSplitterGUI::saveSuperpixels()
     increaseCounter();
 }
 
+void MainSplitterGUI::saveSuperpixelMask(const bool save)
+{
+    dataset_->setSaveSuperpixelsMask(save);
+}
+
 void MainSplitterGUI::autoRun()
 {
     ui->imgList->disconnect();
@@ -308,6 +314,7 @@ void MainSplitterGUI::setRunEnabled(bool enable)
     ui->runButton->setEnabled(enable);
     ui->saveButton->setEnabled(enable);
     ui->autoRunSaveButton->setEnabled(enable);
+    ui->saveSuperpixelMask->setEnabled(enable);
 }
 
 void MainSplitterGUI::increaseCounter()

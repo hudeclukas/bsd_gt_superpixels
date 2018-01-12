@@ -3,6 +3,7 @@
 #include <opencv2/ximgproc/lsc.hpp>
 #include <opencv2/ximgproc/seeds.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 #include "Squares.h"
 
@@ -61,7 +62,7 @@ cv::Mat Splitter::run(const cv::Mat& in, cv::Mat& out, cv::Mat& labelsmask)
         {
             cv::Mat tmp;
             in.copyTo(tmp);
-            auto squares = SuperpixelSquares(tmp, labelsmask, squares_options.size, squares_options.shift);
+            auto squares = SuperpixelSquares(tmp, labelsmask, squares_options_.size, squares_options_.shift);
             squares.iterate();
             cv::Mat mask;
             squares.getLabelContourMask(mask);
@@ -142,22 +143,22 @@ int Splitter::getPrior()
 
 void Splitter::setSquareSize(int size)
 {
-    squares_options.size = size;
+    squares_options_.size = size;
 }
 
 void Splitter::setSquareShift(double shift)
 {
-    squares_options.setShift(shift);
+    squares_options_.setShift(shift);
 }
 
 int Splitter::getSquareSize()
 {
-    return squares_options.size;
+    return squares_options_.size;
 }
 
 double Splitter::getSquareShift()
 {
-    return squares_options.shift_;
+    return squares_options_.shift_;
 }
 
 cv::Mat Splitter::getLabels()

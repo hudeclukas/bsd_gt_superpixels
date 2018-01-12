@@ -74,7 +74,8 @@ public:
 private:
     SeedsOptions seeds_options_;
     LscOptions lsc_options_;
-    SquaresOptions squares_options;
+    SquaresOptions squares_options_;
+
 
     cv::Mat superpixelsLabels;
     std::map<int, std::vector<cv::Mat>> squares;
