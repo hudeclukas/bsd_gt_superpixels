@@ -1,24 +1,20 @@
-#ifndef BERKELEY_H
-#define BERKELEY_H
-
+#ifndef PEXEL_H
+#define PEXEL_H
 #include "Dataset.h"
-#include <map>
-
 
 class QMenu;
 
-class Berkeley : public Dataset
+class Pexel : public Dataset
 {
     Q_OBJECT
 public:
-    Berkeley();
-    ~Berkeley();
+    Pexel();
+    ~Pexel();
 
     public slots:
     void loadTrainData();
     void loadTestData();
-    void loadGroundTruth();
-    
+
     void changeSavePattern() override;
     void setSaveCounter(int value) override;
 
@@ -31,14 +27,10 @@ public:
     void saveSegment2SuperpixelLabels(std::map<int, std::vector<cv::Mat>> obj_patches) override;
 
 private:
-    
-    QMenu *menu;
+    QMenu *menu = nullptr;
     QString trainDataDirPath = "";
     std::vector<QString> trainFiles;
     QString testDataDirPath = "";
     std::vector<QString> testFiles;
-    QString groundTruthDataDirPath = "";
-    std::vector<QString> groundTruthFiles;
-
 };
-#endif // BERKELEY_H
+#endif // PEXEL_H

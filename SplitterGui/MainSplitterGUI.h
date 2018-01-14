@@ -21,6 +21,7 @@ public:
     void on_previous();
     void on_actionExit();
     void on_actionBerkeley();
+    void on_actionPexel();
     void on_LoadAndViewData();
 
     void change_ImageListSelected();

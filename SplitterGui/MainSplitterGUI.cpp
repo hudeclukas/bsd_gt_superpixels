@@ -3,6 +3,7 @@
 #include "ui_SplitterGUI.h"
 
 #include "Berkeley.h"
+#include "Pexel.h"
 #include "Converter.h"
 
 #include <iostream>
@@ -26,6 +27,7 @@ MainSplitterGUI::MainSplitterGUI() : dataset_(nullptr)
     connect(ui->actionNext, SIGNAL(triggered()), this, SLOT(on_next()));
     connect(ui->actionBack, SIGNAL(triggered()), this, SLOT(on_previous()));
     connect(ui->actionBerkeley_dataset, SIGNAL(triggered()), this, SLOT(on_actionBerkeley()));
+    connect(ui->actionPexel_texture, SIGNAL(triggered()), this, SLOT(on_actionPexel()));
     connect(ui->loadDataButton, SIGNAL(clicked()), this, SLOT(on_LoadAndViewData()));
     connect(ui->imgList, SIGNAL(itemSelectionChanged()), this, SLOT(change_ImageListSelected()));
     connect(ui->segList, SIGNAL(itemSelectionChanged()), this, SLOT(change_SegListSelected()));
@@ -67,16 +69,37 @@ void MainSplitterGUI::on_actionBerkeley()
     }
     else
     {
-        try
+        if (dynamic_cast<Berkeley *>(dataset_) != nullptr)
         {
-            dynamic_cast<Berkeley *>(dataset_);
             return;
         }
-        catch (std::bad_cast)
+        ui->menuBar->removeAction(dataset_->getDatasetMenu()->menuAction());
+        delete dataset_;
+        dataset_ = new Berkeley();
+    }
+    ui->menuBar->addMenu(dataset_->getDatasetMenu());
+    connect(ui->actionSave_Folder, SIGNAL(triggered()), dataset_, SLOT(changeSavePattern()));
+    connect(dataset_, SIGNAL(saved(QString)), ui->saveLbl, SLOT(setText(QString)));
+    connect(ui->saveCount, SIGNAL(valueChanged(int)), dataset_, SLOT(setSaveCounter(int)));
+    setRunEnabled(false);
+}
+
+void MainSplitterGUI::on_actionPexel()
+{
+    if (!dataset_)
+    {
+        dataset_ = new Pexel();
+    }
+    else
+    {
+        if (dynamic_cast<Pexel *>(dataset_) != nullptr)
         {
-            delete dataset_;
-            dataset_ = new Berkeley();
+            return;
         }
+        ui->menuBar->removeAction(dataset_->getDatasetMenu()->menuAction());
+        delete dataset_;
+        dataset_ = new Pexel();
+        
     }
     ui->menuBar->addMenu(dataset_->getDatasetMenu());
     connect(ui->actionSave_Folder, SIGNAL(triggered()), dataset_, SLOT(changeSavePattern()));

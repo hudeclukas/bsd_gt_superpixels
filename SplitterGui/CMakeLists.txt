@@ -14,7 +14,9 @@ include_directories(
 
 set(SOURCE_FILES
   MainSplitterGUI.cpp
+  Dataset.cpp
   Berkeley.cpp
+  Pexel.cpp
   DirIO.cpp
 )
 
@@ -23,6 +25,7 @@ set(HEADER_FILES
   Dataset.h
   Converter.h
   Berkeley.h
+  Pexel.h
   DirIO.h
 )
 

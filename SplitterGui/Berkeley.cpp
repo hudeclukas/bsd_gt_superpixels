@@ -4,11 +4,12 @@
 #include <QFileDialog>
 
 #include <iostream>
+#include <fstream>
 
 #include "DirIO.h"
 
 #include <opencv2/core/core.hpp>
-//#include <fstream>
+#include <opencv2/imgcodecs.hpp>
 
 Berkeley::Berkeley()
 {
@@ -181,21 +182,6 @@ cv::Mat Berkeley::getSegmentedImage(QString image, int segmentation)
 void Berkeley::resetData()
 {
     matchedData.clear();
-}
-
-void Berkeley::buildObjectFileName(QString& fileName)
-{
-    auto imgData = matchedData[saveOptions.Image];
-    fileName = saveOptions.Path + "/";
-    if (imgData.type == ImageData::TRAIN)
-    {
-        fileName += "train/";
-    }
-    else if (imgData.type == ImageData::TEST)
-    {
-        fileName += "test/";
-    }
-    fileName += saveOptions.Prefix + "_" + saveOptions.Image + "_" + QString::number(saveOptions.Counter) + "." + saveOptions.Extension;
 }
 
 void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)

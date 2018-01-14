@@ -484,6 +484,7 @@
      <string>Dataset</string>
     </property>
     <addaction name="actionBerkeley_dataset"/>
+    <addaction name="actionPexel_texture"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuNavigation">
@@ -537,6 +538,11 @@
   <action name="actionSave_Folder">
    <property name="text">
     <string>Select Folder</string>
+   </property>
+  </action>
+  <action name="actionPexel_texture">
+   <property name="text">
+    <string>Pexel texture</string>
    </property>
   </action>
  </widget>
