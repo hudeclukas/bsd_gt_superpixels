@@ -2,11 +2,14 @@
 
 #include <set>
 #include <fstream>
+#include <iostream>
 #include <QMenu>
 #include <QDir>
 
 #include <map>
 #include <opencv2/imgcodecs.hpp>
+
+#include "DirIO.h"
 
 
 Superpixel::Pixel::Pixel(int row_, int col_, uchar r_, uchar g_, uchar b_)
@@ -75,6 +78,11 @@ Image::Image(std::map<int, std::vector<cv::Mat>> obj_superpixels)
     }
 }
 
+QMenu* Dataset::getDatasetMenu()
+{
+    return menu;
+}
+
 cv::Mat Dataset::readImage(QString path)
 {
     lastLoadedImagePath = path;
@@ -101,6 +109,52 @@ void Dataset::setSaveSuperpixelsMask(bool save)
 {
     saveSuperpixelsMask = save;
 }
+
+void Dataset::resetData()
+{
+    matchedData.clear();
+}
+
+void Dataset::changeSavePattern()
+{
+    auto savePattern = SaveFileTo("Select where to save", trainDataDirPath);
+    QFileInfo spFI(savePattern);
+    saveOptions.Prefix = spFI.baseName();
+    saveOptions.Path = spFI.absolutePath();
+    saveOptions.Extension = spFI.suffix();
+}
+
+void Dataset::setSaveCounter(int value)
+{
+    saveOptions.Counter = value;
+}
+
+void Dataset::loadTrainData()
+{
+    auto files = GetAllFiles("Select Train Data root folder", std::move(trainDataDirPath), std::move(QStringList() << "*.jpg"), std::move(trainDataDirPath));
+    if (!files.empty())
+    {
+        trainFiles = files;
+    }
+
+    std::cout << trainDataDirPath.toStdString() << std::endl;
+    std::cout << trainFiles.size() << " train files loaded" << std::endl;
+    resetData();
+}
+
+void Dataset::loadTestData()
+{
+    auto files = GetAllFiles("Select Test Data root folder", std::move(testDataDirPath), std::move(QStringList() << "*.jpg"), std::move(testDataDirPath));
+    if (!files.empty())
+    {
+        testFiles = files;
+    }
+
+    std::cout << testDataDirPath.toStdString() << std::endl;
+    std::cout << testFiles.size() << " test files loaded" << std::endl;
+    resetData();
+}
+
 
 void Dataset::writeObjectFile(Image image, QString fileName)
 {
@@ -161,7 +215,7 @@ void Dataset::buildObjectFileName(QString& fileName)
  
 }
 
-std::map<QString, ImageData> MatchImage2Segmentation(std::vector<QString>& images, std::vector<QString> segmentations, ImageData::Type type)
+std::map<QString, ImageData> MatchImage2GroundTruths(std::vector<QString>& images, std::vector<QString> segmentations, ImageData::Type type)
 {
     std::map<QString, ImageData> matches;
     for (auto &imPath : images)

@@ -30,46 +30,6 @@ Berkeley::~Berkeley()
 {
 }
 
-void Berkeley::changeSavePattern()
-{
-    auto savePattern = SaveFileTo("Select where to save", trainDataDirPath);
-    QFileInfo spFI(savePattern);
-    saveOptions.Prefix = spFI.baseName();
-    saveOptions.Path = spFI.absolutePath();
-    saveOptions.Extension = spFI.suffix();
-}
-
-void Berkeley::setSaveCounter(int value)
-{
-    saveOptions.Counter = value;
-}
-
-void Berkeley::loadTrainData()
-{
-    auto files = GetAllFiles("Select Train Data root folder", std::move(trainDataDirPath), std::move(QStringList() << "*.jpg"), std::move(trainDataDirPath));
-    if (!files.empty())
-    {
-        trainFiles = files;
-    }
-    
-    std::cout << trainDataDirPath.toStdString() << std::endl;
-    std::cout << trainFiles.size() << " train files loaded" << std::endl;
-    resetData();
-}
-
-void Berkeley::loadTestData()
-{
-    auto files = GetAllFiles("Select Test Data root folder", std::move(testDataDirPath), std::move(QStringList() << "*.jpg"), std::move(testDataDirPath));
-    if (!files.empty())
-    {
-        testFiles = files;
-    }
-    
-    std::cout << testDataDirPath.toStdString() << std::endl;
-    std::cout << testFiles.size() << " test files loaded" << std::endl;
-    resetData();
-}
-
 void Berkeley::loadGroundTruth()
 {
     auto files = GetAllFiles("Select Ground Truth Data root folder", std::move(groundTruthDataDirPath), std::move(QStringList() << "*.seg"), std::move(groundTruthDataDirPath));
@@ -82,17 +42,12 @@ void Berkeley::loadGroundTruth()
     resetData();
 }
 
-QMenu* Berkeley::getDatasetMenu()
-{
-    return menu;
-}
-
 std::map<QString, ImageData> Berkeley::getLoadedData()
 {
     if (matchedData.empty())
     {
-        matchedData = MatchImage2Segmentation(trainFiles, groundTruthFiles, ImageData::TRAIN);
-        auto testData = MatchImage2Segmentation(testFiles, groundTruthFiles, ImageData::TEST);
+        matchedData = MatchImage2GroundTruths(trainFiles, groundTruthFiles, ImageData::TRAIN);
+        auto testData = MatchImage2GroundTruths(testFiles, groundTruthFiles, ImageData::TEST);
 
         matchedData.insert(testData.begin(), testData.end());
     }
@@ -177,11 +132,6 @@ cv::Mat Berkeley::getSegmentedImage(QString image, int segmentation)
     }
     saveOptions.Image = image;
     return lastLoadedSegment;
-}
-
-void Berkeley::resetData()
-{
-    matchedData.clear();
 }
 
 void Berkeley::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)

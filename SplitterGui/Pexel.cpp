@@ -1,11 +1,9 @@
 #include "Pexel.h"
 
-#include <iostream>
-
 #include <QMenu>
 #include <QFileDialog>
+#include <opencv2/imgcodecs.hpp>
 
-#include "DirIO.h"
 
 Pexel::Pexel()
 {
@@ -23,74 +21,121 @@ Pexel::~Pexel()
 {
 }
 
-void Pexel::loadTrainData()
+cv::Mat Pexel::readImage(QString path)
 {
-    auto files = GetAllFiles("Select Train Data root folder", std::move(trainDataDirPath), std::move(QStringList() << "*.jpg"), std::move(trainDataDirPath));
-    if (!files.empty())
-    {
-        trainFiles = files;
-    }
-
-    std::cout << trainDataDirPath.toStdString() << std::endl;
-    std::cout << trainFiles.size() << " train files loaded" << std::endl;
-    resetData();
+    Dataset::readImage(path);
+    lastLoadedImage.copyTo(lastLoadedSegment);
+    lastLabelsMask = cv::Mat::zeros(lastLoadedImage.rows, lastLoadedImage.cols, CV_32SC1);
+    QFileInfo name(path);
+    saveOptions.Image = name.baseName();
+    return lastLoadedImage;
 }
 
-void Pexel::loadTestData()
-{
-    auto files = GetAllFiles("Select Test Data root folder", std::move(testDataDirPath), std::move(QStringList() << "*.jpg"), std::move(testDataDirPath));
-    if (!files.empty())
-    {
-        testFiles = files;
-    }
-
-    std::cout << testDataDirPath.toStdString() << std::endl;
-    std::cout << testFiles.size() << " test files loaded" << std::endl;
-    resetData();
-}
-
-void Pexel::changeSavePattern()
-{
-    auto savePattern = SaveFileTo("Select where to save", trainDataDirPath);
-    QFileInfo spFI(savePattern);
-    saveOptions.Prefix = spFI.baseName();
-    saveOptions.Path = spFI.absolutePath();
-    saveOptions.Extension = spFI.suffix();
-}
-
-void Pexel::setSaveCounter(int value)
-{
-    saveOptions.Counter = value;
-}
-
-QMenu* Pexel::getDatasetMenu()
-{
-    return menu;
-}
 
 std::map<QString, ImageData> Pexel::getLoadedData()
 {
-    return std::map<QString, ImageData>();
+    if (matchedData.empty())
+    {
+        matchedData = loadImageMetaData(trainFiles, ImageData::TRAIN);
+        auto testData = loadImageMetaData(testFiles, ImageData::TEST);
+
+        matchedData.insert(testData.begin(), testData.end());
+    }
+    return matchedData;
 }
 
-void Pexel::drawSegments(const cv::Mat& input, cv::Mat& output, QString& ground_truth_path)
+cv::Mat Pexel::getSegmentedImage(QString image, int)
 {
+    if (matchedData.empty())
+    {
+        return cv::Mat();
+    }
+    auto imageData = matchedData[image];
+    if (imageData.groundTruths.empty()) return cv::Mat();
+
+    if (imageData.absPath.compare(lastLoadedImagePath) == 0)
+    {
+        lastLoadedImage.copyTo(lastLoadedSegment);
+    }
+    saveOptions.Image = image;
+    return lastLoadedSegment;
 }
 
-cv::Mat Pexel::getSegmentedImage(QString image, int segmentation)
+void Pexel::saveSegment2SuperpixelLabels(cv::Mat superpixelsLabels)
 {
-    return cv::Mat();
-}
+    if (saveSuperpixelsMask)
+    {
+        cv::Mat tmp;
+        superpixelsLabels.convertTo(tmp, CV_16UC1);
+        tmp += 1;
+        auto path = saveOptions.Path + "/";
+        QDir dir(path);
+        if (!dir.exists("segments/"))
+        {
+            dir.mkdir("segments/");
+        }
+        cv::imwrite(path.toStdString() + "segments/" + saveOptions.Prefix.toStdString() + "_" + saveOptions.Image.toStdString() + "_" + std::to_string(saveOptions.Counter) + ".png", tmp);
+    }
+    double maxSups;
+    cv::minMaxIdx(superpixelsLabels, nullptr, &maxSups);
+    maxSups++;
 
-void Pexel::resetData()
-{
-    matchedData.clear();
-}
+    Image image;
+    image.name = saveOptions.Image;
+    image.objects.push_back(Image::ImageObject(maxSups));
+    
+    for (auto row = 0; row < superpixelsLabels.rows; ++row)
+    {
+        auto sPtr = superpixelsLabels.ptr<int>(row);
+        auto iPtr = lastLoadedImage.ptr<cv::Vec3b>(row);
+        for (auto col = 0; col < superpixelsLabels.cols; ++col)
+        {
+            image.objects[0][sPtr[col]].pixels.push_back({ row, col, iPtr[col] });
+            image.objects[0][sPtr[col]].label = sPtr[col];
+        }
+    }
 
-void Pexel::saveSegment2SuperpixelLabels(cv::Mat image)
-{
+    if (saveOptions.Path.isEmpty())
+    {
+        changeSavePattern();
+    }
+
+    QString fileName;
+    buildObjectFileName(fileName);
+    writeObjectFile(image, fileName);
+
+    emit saved(QString("<font color='#045ae5'>" + fileName + "</font>"));
 }
 
 void Pexel::saveSegment2SuperpixelLabels(std::map<int, std::vector<cv::Mat>> obj_patches)
 {
+    Image image(obj_patches);
+    image.name = saveOptions.Image;
+
+    if (saveOptions.Path.isEmpty())
+    {
+        changeSavePattern();
+    }
+
+    QString fileName;
+    buildObjectFileName(fileName);
+    writeObjectFile(image, fileName);
+
+    emit saved(QString("<font color='#045ae5'>" + fileName + "</font>"));
+}
+
+std::map<QString, ImageData> Pexel::loadImageMetaData(std::vector<QString>& images, ImageData::Type type)
+{
+    std::map<QString, ImageData> loadedImageData;
+    for (auto &imPath : images)
+    {
+        QFileInfo imFI = QFileInfo(imPath);
+        ImageData id;
+        id.name = imFI.baseName();
+        id.absPath = imPath;
+        id.type = type;
+        
+        loadedImageData[id.name] = id;
+    }
+    return loadedImageData;
 }

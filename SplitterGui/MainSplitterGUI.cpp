@@ -167,7 +167,10 @@ void MainSplitterGUI::change_SegListSelected()
     auto segm = ui->segList->currentRow();
     auto image = ui->imgList->currentItem()->text();
     auto mimage = dataset_->getSegmentedImage(image, segm);
-    setImageTo(mimage, ui->objImage);
+    if (!mimage.empty())
+    {
+        setImageTo(mimage, ui->objImage);
+    }
 }
 
 void MainSplitterGUI::change_AlgorithmSelection(int algo)
@@ -260,6 +263,13 @@ void MainSplitterGUI::autoRun()
         counter = 0;
         ui->imgList->setCurrentRow(imgIt);
         change_ImageListSelected();
+        if (ui->segList->count() == 0)
+        {
+            runSuperpixel();
+            saveSuperpixels();
+            counter++;
+            dataset_->setSaveCounter(counter);
+        }
         for (auto segIt = 0; segIt < ui->segList->count(); ++segIt)
         {
             ui->segList->setCurrentRow(segIt);

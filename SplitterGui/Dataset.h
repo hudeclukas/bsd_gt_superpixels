@@ -64,14 +64,7 @@ class Dataset : public QObject
 
 public:
 
-    virtual QMenu * getDatasetMenu() = 0;
-    virtual std::map<QString, ImageData> getLoadedData() = 0;
-    virtual cv::Mat getSegmentedImage(QString image, int segmentation = 0) = 0;
-    virtual void resetData() = 0;
-    virtual void saveSegment2SuperpixelLabels(cv::Mat image) = 0;
-    virtual void saveSegment2SuperpixelLabels(std::map<int, std::vector<cv::Mat>> patches) = 0;
-
-    cv::Mat readImage(QString path);
+    virtual cv::Mat readImage(QString path);
     cv::Mat image();
     cv::Mat segments();
     cv::Mat &mask();
@@ -79,28 +72,49 @@ public:
     void setSaveSuperpixelsMask(bool save);
 
     public slots:
-    virtual void changeSavePattern() = 0;
-    virtual void setSaveCounter(int value) = 0;
+    virtual QMenu * getDatasetMenu();
+
+    virtual std::map<QString, ImageData> getLoadedData() = 0;
+    virtual cv::Mat getSegmentedImage(QString image, int segmentation = 0) = 0;
+    virtual void resetData();
+    virtual void saveSegment2SuperpixelLabels(cv::Mat image) = 0;
+    virtual void saveSegment2SuperpixelLabels(std::map<int, std::vector<cv::Mat>> patches) = 0;
+
+    virtual void changeSavePattern();
+    virtual void setSaveCounter(int value);
+    void loadTrainData();
+    void loadTestData();
 
     signals:
     void saved(QString path);
 
 protected:
-    QString lastLoadedImagePath;
-    cv::Mat lastLoadedImage;
-    cv::Mat lastLoadedSegment;
-    cv::Mat lastLabelsMask;
-    cv::Mat lastEdgesMask;
+    QMenu *menu = nullptr;
 
-    std::map<QString, ImageData> matchedData;
+    QString trainDataDirPath = "";
+    std::vector<QString> trainFiles;
+    QString testDataDirPath = "";
+    std::vector<QString> testFiles;
 
     SaveOptions saveOptions;
     bool saveSuperpixelsMask = false;
+
+    QString lastLoadedImagePath;
+    // Last loaded and used RGB image from dataset
+    cv::Mat lastLoadedImage;
+    // Last loaded and used Ground Truth segmentation
+    cv::Mat lastLoadedSegment;
+    // Last used Ground Truth segment label-indexes mask
+    cv::Mat lastLabelsMask;
+    // Last used Ground Truth segment edges mask
+    cv::Mat lastEdgesMask;
+
+    std::map<QString, ImageData> matchedData;
 
     void buildObjectFileName(QString& fileName);
     static void writeObjectFile(Image image, QString fileName);
 };
 
-std::map<QString, ImageData> MatchImage2Segmentation(std::vector<QString>& images, std::vector<QString> segmentations, ImageData::Type type);
+std::map<QString, ImageData> MatchImage2GroundTruths(std::vector<QString>& images, std::vector<QString> segmentations, ImageData::Type type);
 
 #endif // DATASET_H
